@@ -9,5 +9,5 @@ public class SpringBootQuizStarterApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootQuizStarterApplication.class, args);
 	}
-
+	
 }
