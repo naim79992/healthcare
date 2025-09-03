@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>Daily Report</title></head>
+<body>
+<h2>Daily Prescription Count</h2>
+<form method="get" action="/report/daily">
+  Start: <input type="date" name="start" th:value="${start}"/>
+  End: <input type="date" name="end" th:value="${end}"/>
+  <button type="submit">Filter</button>
+  <a href="/prescriptions">Back</a>
+</form>
+
+<table border="1" cellpadding="5">
+  <thead><tr><th>Date</th><th>Count</th></tr></thead>
+  <tbody>
+    <tr th:each="entry : ${dayCount.entrySet()}">
+      <td th:text="${entry.key}">date</td>
+      <td th:text="${entry.value}">count</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

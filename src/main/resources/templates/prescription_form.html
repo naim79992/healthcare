@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head><meta charset="UTF-8"/><title>Prescription Form</title></head>
+<body>
+<h2>Prescription</h2>
+<form th:action="@{${prescription.id} != null ? '/prescription/' + ${prescription.id} : '/prescription'}" th:object="${prescription}" method="post">
+  <div>
+    <label>Prescription Date:
+      <input type="date" th:field="*{prescriptionDate}" />
+    </label>
+    <div th:if="${#fields.hasErrors('prescriptionDate')}" th:errors="*{prescriptionDate}"></div>
+  </div>
+
+  <div>
+    <label>Patient Name:
+      <input type="text" th:field="*{patientName}" />
+    </label>
+    <div th:if="${#fields.hasErrors('patientName')}" th:errors="*{patientName}"></div>
+  </div>
+
+  <div>
+    <label>Patient Age:
+      <input type="number" th:field="*{patientAge}" />
+    </label>
+    <div th:if="${#fields.hasErrors('patientAge')}" th:errors="*{patientAge}"></div>
+  </div>
+
+  <div>
+    <label>Gender:
+      <select th:field="*{patientGender}">
+        <option value="">--Select--</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </label>
+    <div th:if="${#fields.hasErrors('patientGender')}" th:errors="*{patientGender}"></div>
+  </div>
+
+  <div>
+    <label>Diagnosis:
+      <textarea th:field="*{diagnosis}"></textarea>
+    </label>
+  </div>
+
+  <div>
+    <label>Medicines:
+      <textarea th:field="*{medicines}"></textarea>
+    </label>
+  </div>
+
+  <div>
+    <label>Next Visit Date:
+      <input type="date" th:field="*{nextVisitDate}" />
+    </label>
+  </div>
+
+  <div>
+    <button type="submit">Save</button>
+    <a href="/prescriptions">Cancel</a>
+  </div>
+</form>
+</body>
+</html>
