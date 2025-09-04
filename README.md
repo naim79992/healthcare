@@ -130,11 +130,7 @@ mvn spring-boot:run
 * Browser: `http://localhost:8080`
 * H2 Console (optional): `http://localhost:8080/h2-console`
 
----
 
-Here’s a complete guide you can add to your README:
-
----
 
 ## Using Swagger for API Documentation
 
