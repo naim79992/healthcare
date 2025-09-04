@@ -7,6 +7,12 @@
 ## Features
 
 * User authentication (no anonymous access)
+  
+     * **Have pre-stored user credentials data in data.sql**
+     * **User can signup, but they need approval from database adminestrator(make ENABLE=TRUE if account creation request you want to approve), after approval can login.**
+     * **Can add,modify,delete user credentials from database**
+     * **Have option to make password encrypted so that database adminestretor can't see real password**
+       
 * Create, edit, delete prescriptions
 * Day-wise prescription report
 * REST API endpoint: `/api/v1/prescriptions` (JSON response)
