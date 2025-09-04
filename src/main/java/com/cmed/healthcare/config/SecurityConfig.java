@@ -36,10 +36,26 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
     }
 
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+public PasswordEncoder passwordEncoder() {
+    // Raw password use korar jonno
+    return new PasswordEncoder() {
+        @Override
+        public String encode(CharSequence rawPassword) {
+            return rawPassword.toString(); // Encode na kore raw return
+        }
+
+        @Override
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            return rawPassword.toString().equals(encodedPassword); // Raw comparison
+        }
+    };
+}
+
 
     // Redirect users based on role after login
     @Bean
