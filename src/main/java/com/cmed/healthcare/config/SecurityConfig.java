@@ -36,10 +36,12 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
     }
 
-    // @Bean
+    //  @Bean
     // public PasswordEncoder passwordEncoder() {
     //     return new BCryptPasswordEncoder();
     // }
+
+
     @Bean
 public PasswordEncoder passwordEncoder() {
     // Raw password use korar jonno
