@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users")
-public class user {   // Class name corrected to PascalCase
+public class User {   // Class name corrected to PascalCase
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class user {   // Class name corrected to PascalCase
     private boolean enabled = false; // New users disabled until approved
 
     // Default constructor (required by JPA)
-    public user() {}
+    public User() {}
 
     // Getters & Setters
     public Long getId() { return id; }

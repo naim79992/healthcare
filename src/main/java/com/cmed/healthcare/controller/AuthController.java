@@ -1,6 +1,6 @@
 package com.cmed.healthcare.controller;
 
-import com.cmed.healthcare.model.user;
+import com.cmed.healthcare.model.User;
 import com.cmed.healthcare.repository.UserRepository;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class AuthController {
     // }
 
 @PostMapping("/signup")
-public ResponseEntity<user> signup(@RequestBody user user) {
+public ResponseEntity<User> signup(@RequestBody User user) {
     // Encode password
     user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -48,7 +48,7 @@ public ResponseEntity<user> signup(@RequestBody user user) {
 
 @PutMapping("/approve/{id}")
 public ResponseEntity<String> approveUser(@PathVariable Long id) {
-    user user = userRepo.findById(id).orElseThrow();
+    User user = userRepo.findById(id).orElseThrow();
     user.setEnabled(true);
     userRepo.save(user);
     return ResponseEntity.ok("User approved successfully!");

@@ -1,6 +1,6 @@
 package com.cmed.healthcare.config;
 
-import com.cmed.healthcare.model.user;
+import com.cmed.healthcare.model.User;
 import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepo.findByUsername(username)
-                .filter(user::isEnabled) // must be true in DB
+                .filter(User::isEnabled) // must be true in DB
                 .map(u -> org.springframework.security.core.userdetails.User
                         .withUsername(u.getUsername())
                         .password(u.getPassword()) // must be BCrypt encoded
@@ -61,7 +61,7 @@ public PasswordEncoder passwordEncoder() {
     @Bean
     public AuthenticationSuccessHandler mySuccessHandler() {
         return (request, response, authentication) -> {
-            user currentUser = userRepo.findByUsername(authentication.getName())
+            User currentUser = userRepo.findByUsername(authentication.getName())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found after login"));
 
             String role = currentUser.getRole();

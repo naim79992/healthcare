@@ -1,7 +1,7 @@
 package com.cmed.healthcare.controller;
 
 import com.cmed.healthcare.model.Prescription;
-import com.cmed.healthcare.model.user;
+import com.cmed.healthcare.model.User;
 import com.cmed.healthcare.repository.PrescriptionRepository;
 import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,7 @@ public class PrescriptionController {
         LocalDate s = (start == null) ? YearMonth.now().atDay(1) : LocalDate.parse(start);
         LocalDate e = (end == null) ? YearMonth.now().atEndOfMonth() : LocalDate.parse(end);
 
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         String role = currentUser.getRole();
 
         switch (role) {
@@ -58,7 +58,7 @@ public class PrescriptionController {
         Prescription presc = repo.findById(id).orElse(null);
         if (presc == null) return ResponseEntity.notFound().build();
 
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         String role = currentUser.getRole();
 
         if ((role.equals("USER") && !presc.getPatientName().equals(currentUser.getUsername())) ||
@@ -72,7 +72,7 @@ public class PrescriptionController {
     // Create prescription (DOCTOR only)
     @PostMapping
     public ResponseEntity<Prescription> create(@Valid @RequestBody Prescription presc, Authentication auth) {
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         if (!"DOCTOR".equals(currentUser.getRole())) {
             return ResponseEntity.status(403).build();
         }
@@ -89,7 +89,7 @@ public class PrescriptionController {
         Prescription existing = repo.findById(id).orElse(null);
         if (existing == null) return ResponseEntity.notFound().build();
 
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         if (!currentUser.getRole().equals("DOCTOR") || !existing.getDoctorName().equals(currentUser.getUsername())) {
             return ResponseEntity.status(403).build();
         }
@@ -111,7 +111,7 @@ public class PrescriptionController {
         Prescription existing = repo.findById(id).orElse(null);
         if (existing == null) return ResponseEntity.notFound().build();
 
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         if (!currentUser.getRole().equals("DOCTOR") || !existing.getDoctorName().equals(currentUser.getUsername())) {
             return ResponseEntity.status(403).build();
         }
@@ -127,7 +127,7 @@ public class PrescriptionController {
             @RequestParam(required = false) String end,
             Authentication auth) {
 
-        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        User currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
         String role = currentUser.getRole();
 
         LocalDate s = (start == null) ? YearMonth.now().atDay(1) : LocalDate.parse(start);
@@ -135,18 +135,21 @@ public class PrescriptionController {
 
         List<Object[]> rows;
         switch (role) {
-            case "ADMIN":
-            case "PHARMACIST":
-            case "MEDICAL_STAFF":
-                rows = repo.countDayWise(s, e);
-                break;
-            case "DOCTOR":
-            case "USER":
-                rows = repo.countDayWiseForPatient(s, e, currentUser.getUsername());
-                break;
-            default:
-                return ResponseEntity.status(403).build();
-        }
+    case "ADMIN":
+    case "PHARMACIST":
+    case "MEDICAL_STAFF":
+        rows = repo.countDayWise(s, e);
+        break;
+    case "DOCTOR":
+        rows = repo.countDayWiseForDoctor(s, e, currentUser.getUsername());
+        break;
+    case "USER":
+        rows = repo.countDayWiseForPatient(s, e, currentUser.getUsername());
+        break;
+    default:
+        return ResponseEntity.status(403).build();
+}
+
 
         List<Map<String, Object>> report = new ArrayList<>();
         for (Object[] r : rows) {

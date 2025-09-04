@@ -19,13 +19,14 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     // For DOCTOR
     List<Prescription> findByPrescriptionDateBetweenAndDoctorName(LocalDate start, LocalDate end, String doctorName);
 
-    // Day-wise count report
+    // Day-wise count report for all
     @Query("SELECT p.prescriptionDate, COUNT(p) FROM Prescription p " +
            "WHERE p.prescriptionDate BETWEEN :start AND :end " +
            "GROUP BY p.prescriptionDate " +
            "ORDER BY p.prescriptionDate")
     List<Object[]> countDayWise(@Param("start") LocalDate start, @Param("end") LocalDate end);
 
+    // Day-wise count report for specific patient
     @Query("SELECT p.prescriptionDate, COUNT(p) FROM Prescription p " +
            "WHERE p.prescriptionDate BETWEEN :start AND :end " +
            "AND p.patientName = :patientName " +
@@ -34,4 +35,14 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
     List<Object[]> countDayWiseForPatient(@Param("start") LocalDate start,
                                           @Param("end") LocalDate end,
                                           @Param("patientName") String patientName);
+
+    // Day-wise count report for specific doctor
+    @Query("SELECT p.prescriptionDate, COUNT(p) FROM Prescription p " +
+           "WHERE p.prescriptionDate BETWEEN :start AND :end " +
+           "AND p.doctorName = :doctorName " +
+           "GROUP BY p.prescriptionDate " +
+           "ORDER BY p.prescriptionDate")
+    List<Object[]> countDayWiseForDoctor(@Param("start") LocalDate start,
+                                         @Param("end") LocalDate end,
+                                         @Param("doctorName") String doctorName);
 }
