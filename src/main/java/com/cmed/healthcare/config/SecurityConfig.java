@@ -81,33 +81,45 @@ public PasswordEncoder passwordEncoder() {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/login.html",
-                        "/signup.html",
-                        "/css/**",
-                        "/js/**",
-                        "/h2-console/**",
-                        "/api/v1/auth/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login.html")
-                .loginProcessingUrl("/login")
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .successHandler(mySuccessHandler()) // redirect based on role
-                .failureUrl("/login.html?error=true")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login.html?logout=true")
-                .permitAll()
-            );
+    .csrf(csrf -> csrf.disable())
+    .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+    .authorizeHttpRequests(auth -> auth
+        // Public endpoints
+        .requestMatchers(
+            "/login.html",
+            "/signup.html",
+            "/css/**",
+            "/js/**",
+            "/h2-console/**",
+            "/api/v1/auth/**"
+        ).permitAll()
+        // Everything else secured
+        .anyRequest().authenticated()
+    )
+    .formLogin(form -> form
+        .loginPage("/login.html")
+        .loginProcessingUrl("/login")
+        .usernameParameter("username")
+        .passwordParameter("password")
+        .successHandler(mySuccessHandler())
+        .failureHandler((req, res, ex) -> {
+            // Return JSON instead of redirect
+            res.setStatus(401);
+            res.setContentType("application/json");
+            res.getWriter().write("{\"error\": \"Authentication failed\"}");
+        })
+        .permitAll()
+    )
+    .logout(logout -> logout
+        .logoutUrl("/logout")
+        .logoutSuccessHandler((req, res, auth) -> {
+            res.setStatus(200);
+            res.setContentType("application/json");
+            res.getWriter().write("{\"message\": \"Logged out\"}");
+        })
+        .permitAll()
+    );
+
 
         return http.build();
     }
