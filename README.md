@@ -30,8 +30,8 @@
      * **Have option to make password encrypted so that database adminestretor can't see real password**
 
 *Allow the authenticated users to create new prescriptions which will be saved in DB.
-Note that you should show proper error messages when invalid data is submitted on
-form submission. The prescription will contain:
+Also should show proper error messages when invalid data is submitted on
+form submission. The prescription contain:
 ○ Prescription Date (valid date, mandatory)
 ○ Patient Name (text, mandatory)
 ○ Patient Age (integer, valid age range, mandatory)
