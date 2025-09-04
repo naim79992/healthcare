@@ -57,9 +57,9 @@ public ResponseEntity<String> approveUser(@PathVariable Long id) {
 
 
 
-    // Test endpoint (secured)
-    @GetMapping("/me")
-    public ResponseEntity<String> me(@RequestParam String username) {
-        return ResponseEntity.ok("Hello " + username + "!");
-    }
+    // // Test endpoint (secured)
+    // @GetMapping("/me")
+    // public ResponseEntity<String> me(@RequestParam String username) {
+    //     return ResponseEntity.ok("Hello " + username + "!");
+    // }
 }
