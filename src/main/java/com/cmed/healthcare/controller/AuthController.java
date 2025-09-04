@@ -37,12 +37,13 @@ public ResponseEntity<User> signup(@RequestBody User user) {
     user.setEnabled(false);
 
     // Validate role: only allowed roles can be selected
-    List<String> allowedRoles = List.of("USER", "DOCTOR", "PHARMACIST", "MEDICAL_STAFF");
-    if (!allowedRoles.contains(user.getRole())) {
-        user.setRole("USER"); // default
-    }
-    // Save user
-    return ResponseEntity.ok(userRepo.save(user));
+    String role = user.getRole() != null ? user.getRole().toUpperCase() : "USER";
+   List<String> allowedRoles = List.of("USER", "DOCTOR", "PHARMACIST", "MEDICAL_STAFF");
+    if (!allowedRoles.contains(role)) {
+    role = "USER";
+   }
+    user.setRole(role);
+
 }
 
 
