@@ -2,6 +2,9 @@ package com.cmed.healthcare.controller;
 
 import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +28,23 @@ public class AuthController {
     //     return ResponseEntity.ok(userRepo.save(user));
     // }
 
-    @PostMapping("/signup")
-public ResponseEntity<String> signup(@RequestBody user user) {
+@PostMapping("/signup")
+public ResponseEntity<user> signup(@RequestBody user user) {
+    // Encode password
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    user.setEnabled(false); // নতুন user disable
-    userRepo.save(user);
-    return ResponseEntity.ok("Signup successful! Please wait for approval.");
+
+    // Force enabled=false for all signups
+    user.setEnabled(false);
+
+    // Validate role: only allowed roles can be selected
+    List<String> allowedRoles = List.of("USER", "DOCTOR", "PHARMACIST", "MEDICAL_STAFF");
+    if (!allowedRoles.contains(user.getRole())) {
+        user.setRole("USER"); // default
+    }
+    // Save user
+    return ResponseEntity.ok(userRepo.save(user));
 }
+
 
 @PutMapping("/approve/{id}")
 public ResponseEntity<String> approveUser(@PathVariable Long id) {

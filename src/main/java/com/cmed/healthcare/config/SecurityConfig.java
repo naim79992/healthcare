@@ -4,14 +4,17 @@ import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserRepository userRepo;
@@ -20,79 +23,74 @@ public class SecurityConfig {
         this.userRepo = userRepo;
     }
 
-    // @Bean
-    // UserDetailsService userDetailsService() {
-    //     return username -> userRepo.findByUsername(username)
-    //             .map(user -> org.springframework.security.core.userdetails.User
-    //                     .withUsername(user.getUsername())
-    //                     .password(user.getPassword())
-    //                     .roles(user.getRole())
-    //                     .build())
-    //             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    // }
-
+    // Only enabled users can login
     @Bean
-public UserDetailsService userDetailsService() {
-    return username -> userRepo.findByUsername(username)
-            .filter(user::isEnabled) // only enabled hole login hbe
-            .map(user -> org.springframework.security.core.userdetails.User
-                    .withUsername(user.getUsername())
-                    .password(user.getPassword())
-                    .roles(user.getRole())
-                    .build())
-            .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
-}
-
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // password hashing
+    public UserDetailsService userDetailsService() {
+        return username -> userRepo.findByUsername(username)
+                .filter(user::isEnabled) // must be true in DB
+                .map(u -> org.springframework.security.core.userdetails.User
+                        .withUsername(u.getUsername())
+                        .password(u.getPassword()) // must be BCrypt encoded
+                        .roles(u.getRole())        // must match DB role exactly
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
     }
 
-//     @Bean
-//     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//     http
-//         .csrf(csrf -> csrf.disable())
-//         .authorizeHttpRequests(auth -> auth
-//             .requestMatchers("/api/v1/auth/**", "/login.html", "/signup.html", "/css/**", "/js/**", "/h2-console/**").permitAll()
-//             .anyRequest().authenticated()
-//         )
-//         .formLogin(form -> form
-//     .loginPage("/login.html")
-//     .loginProcessingUrl("/login")          // POST action URL your form uses
-//     .usernameParameter("username")         // form field for username
-//     .passwordParameter("password")         // form field for password
-//     .defaultSuccessUrl("/index.html", true)
-//     .failureUrl("/login.html?error=true")
-//     .permitAll()
-// )
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-//         .logout(logout -> logout.permitAll());
+    // Redirect users based on role after login
+    @Bean
+    public AuthenticationSuccessHandler mySuccessHandler() {
+        return (request, response, authentication) -> {
+            user currentUser = userRepo.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found after login"));
 
-//     return http.build();
-// }
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable()) // disable CSRF for simple login
-        .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // allow H2 console
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/login.html", "/signup.html", "/css/**", "/js/**", "/h2-console/**", "/api/v1/auth/**")
-            .permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-            .loginPage("/login.html")
-            .loginProcessingUrl("/login")
-            .usernameParameter("username")
-            .passwordParameter("password")
-            .defaultSuccessUrl("/index.html", true)
-            .failureUrl("/login.html?error=true")
-            .permitAll()
-        )
-        .logout(logout -> logout.permitAll());
+            String role = currentUser.getRole();
+            if ("DOCTOR".equals(role)) {
+                response.sendRedirect("/index.html");
+            } else if ("PHARMACIST".equals(role) || "MEDICAL_STAFF".equals(role)) {
+                response.sendRedirect("/staff.html");
+            } else {
+                response.sendRedirect("/index.html");
+            }
+        };
+    }
 
-    return http.build();
-}
+    // Security filter chain
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/login.html",
+                        "/signup.html",
+                        "/css/**",
+                        "/js/**",
+                        "/h2-console/**",
+                        "/api/v1/auth/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login.html")
+                .loginProcessingUrl("/login")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .successHandler(mySuccessHandler()) // redirect based on role
+                .failureUrl("/login.html?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login.html?logout=true")
+                .permitAll()
+            );
 
-}
+        return http.build();
+    }
+} 

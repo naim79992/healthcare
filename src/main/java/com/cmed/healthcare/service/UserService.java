@@ -2,6 +2,7 @@ package com.cmed.healthcare.service;
 
 import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,4 +24,5 @@ public class UserService {
         user.setRole("USER");
         return userRepo.save(user);
     }
+
 }

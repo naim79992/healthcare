@@ -1,99 +1,160 @@
 package com.cmed.healthcare.controller;
 
 import com.cmed.healthcare.model.Prescription;
+import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.PrescriptionRepository;
-import jakarta.validation.Valid;
+import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/prescriptions")
 public class PrescriptionController {
 
     private final PrescriptionRepository repo;
+    private final UserRepository userRepo;
 
-    public PrescriptionController(PrescriptionRepository repo) {
+    public PrescriptionController(PrescriptionRepository repo, UserRepository userRepo) {
         this.repo = repo;
+        this.userRepo = userRepo;
     }
 
-    // Get prescriptions list (optional date range)
+    // List prescriptions
     @GetMapping
     public List<Prescription> list(
             @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end) {
+            @RequestParam(required = false) String end,
+            Authentication auth) {
 
         LocalDate s = (start == null) ? YearMonth.now().atDay(1) : LocalDate.parse(start);
         LocalDate e = (end == null) ? YearMonth.now().atEndOfMonth() : LocalDate.parse(end);
 
-        return repo.findByPrescriptionDateBetween(s, e);
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        String role = currentUser.getRole();
+
+        switch (role) {
+            case "ADMIN":
+            case "PHARMACIST":
+            case "MEDICAL_STAFF":
+                return repo.findByPrescriptionDateBetween(s, e);
+            case "DOCTOR":
+                return repo.findByPrescriptionDateBetweenAndDoctorName(s, e, currentUser.getUsername());
+            case "USER":
+                return repo.findByPrescriptionDateBetweenAndPatientName(s, e, currentUser.getUsername());
+            default:
+                return Collections.emptyList();
+        }
     }
 
     // Get single prescription
     @GetMapping("/{id}")
-    public ResponseEntity<Prescription> get(@PathVariable Long id) {
-        return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Prescription> get(@PathVariable Long id, Authentication auth) {
+        Prescription presc = repo.findById(id).orElse(null);
+        if (presc == null) return ResponseEntity.notFound().build();
+
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        String role = currentUser.getRole();
+
+        if ((role.equals("USER") && !presc.getPatientName().equals(currentUser.getUsername())) ||
+            (role.equals("DOCTOR") && !presc.getDoctorName().equals(currentUser.getUsername()))) {
+            return ResponseEntity.status(403).build();
+        }
+
+        return ResponseEntity.ok(presc);
     }
 
-    // Create new prescription
+    // Create prescription (DOCTOR only)
     @PostMapping
-    public ResponseEntity<Prescription> create(@Valid @RequestBody Prescription presc) {
+    public ResponseEntity<Prescription> create(@Valid @RequestBody Prescription presc, Authentication auth) {
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        if (!"DOCTOR".equals(currentUser.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        // Keep patientName from form
+        presc.setDoctorName(currentUser.getUsername());
+
         return ResponseEntity.ok(repo.save(presc));
     }
 
-    // Update prescription
+    // Update prescription (DOCTOR only)
     @PutMapping("/{id}")
-    public ResponseEntity<Prescription> update(@PathVariable Long id, @Valid @RequestBody Prescription presc) {
-        return repo.findById(id).map(existing -> {
-            existing.setPrescriptionDate(presc.getPrescriptionDate());
-            existing.setPatientName(presc.getPatientName());
-            existing.setPatientAge(presc.getPatientAge());
-            existing.setPatientGender(presc.getPatientGender());
-            existing.setDiagnosis(presc.getDiagnosis());
-            existing.setMedicines(presc.getMedicines());
-            existing.setNextVisitDate(presc.getNextVisitDate());
-            repo.save(existing);
-            return ResponseEntity.ok(existing);
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Prescription> update(@PathVariable Long id, @Valid @RequestBody Prescription presc, Authentication auth) {
+        Prescription existing = repo.findById(id).orElse(null);
+        if (existing == null) return ResponseEntity.notFound().build();
+
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        if (!currentUser.getRole().equals("DOCTOR") || !existing.getDoctorName().equals(currentUser.getUsername())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        existing.setPrescriptionDate(presc.getPrescriptionDate());
+        existing.setPatientName(presc.getPatientName());
+        existing.setPatientAge(presc.getPatientAge());
+        existing.setPatientGender(presc.getPatientGender());
+        existing.setDiagnosis(presc.getDiagnosis());
+        existing.setMedicines(presc.getMedicines());
+        existing.setNextVisitDate(presc.getNextVisitDate());
+        repo.save(existing);
+        return ResponseEntity.ok(existing);
     }
 
-    // Delete prescription
+    // Delete prescription (DOCTOR only)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!repo.existsById(id)) return ResponseEntity.notFound().build();
-        repo.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication auth) {
+        Prescription existing = repo.findById(id).orElse(null);
+        if (existing == null) return ResponseEntity.notFound().build();
+
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        if (!currentUser.getRole().equals("DOCTOR") || !existing.getDoctorName().equals(currentUser.getUsername())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        repo.delete(existing);
         return ResponseEntity.noContent().build();
     }
 
-    // Day-wise prescription count report
+    // Day-wise report
     @GetMapping("/report/daywise")
-    public List<Map<String, Object>> dayWiseReport(
+    public ResponseEntity<List<Map<String, Object>>> dayWiseReport(
             @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end) {
+            @RequestParam(required = false) String end,
+            Authentication auth) {
+
+        user currentUser = userRepo.findByUsername(auth.getName()).orElseThrow();
+        String role = currentUser.getRole();
 
         LocalDate s = (start == null) ? YearMonth.now().atDay(1) : LocalDate.parse(start);
         LocalDate e = (end == null) ? YearMonth.now().atEndOfMonth() : LocalDate.parse(end);
 
-        // Make sure repository has this method:
-        // @Query("SELECT p.prescriptionDate, COUNT(p) FROM Prescription p WHERE p.prescriptionDate BETWEEN :start AND :end GROUP BY p.prescriptionDate")
-        List<Object[]> rows = repo.countDayWise(s, e);
+        List<Object[]> rows;
+        switch (role) {
+            case "ADMIN":
+            case "PHARMACIST":
+            case "MEDICAL_STAFF":
+                rows = repo.countDayWise(s, e);
+                break;
+            case "DOCTOR":
+            case "USER":
+                rows = repo.countDayWiseForPatient(s, e, currentUser.getUsername());
+                break;
+            default:
+                return ResponseEntity.status(403).build();
+        }
 
-        return rows.stream().map(r -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("day", r[0].toString());
-            m.put("count", ((Number) r[1]).intValue());
-            return m;
-        }).collect(Collectors.toList());
+        List<Map<String, Object>> report = new ArrayList<>();
+        for (Object[] r : rows) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("day", r[0].toString());
+            map.put("count", ((Number) r[1]).intValue());
+            report.add(map);
+        }
+        return ResponseEntity.ok(report);
     }
-
-    // Get all prescriptions (REST API)
-@GetMapping("/all")
-public List<Prescription> getAllPrescriptions() {
-    return repo.findAll();
-}
-
 }

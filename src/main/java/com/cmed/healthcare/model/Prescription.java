@@ -1,124 +1,51 @@
 package com.cmed.healthcare.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
-
 
 @Entity
 public class Prescription {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-@NotNull(message = "Prescription date is required")
-private LocalDate prescriptionDate;
+    private LocalDate prescriptionDate;
+    private String patientName;
+    private Integer patientAge;
+    private String patientGender;
+    private String diagnosis;
+    private String medicines;
+    private LocalDate nextVisitDate;
 
+    // New field to track doctor
+    private String doctorName;
 
-@NotBlank(message = "Patient name is required")
-private String patientName;
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
+    public LocalDate getPrescriptionDate() { return prescriptionDate; }
+    public void setPrescriptionDate(LocalDate prescriptionDate) { this.prescriptionDate = prescriptionDate; }
 
-@NotNull(message = "Patient age is required")
-@Min(value = 0, message = "Age must be >= 0")
-@Max(value = 150, message = "Age must be <= 150")
-private Integer patientAge;
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
 
+    public Integer getPatientAge() { return patientAge; }
+    public void setPatientAge(Integer patientAge) { this.patientAge = patientAge; }
 
-@NotBlank(message = "Patient gender is required")
-private String patientGender; // e.g. Male/Female/Other
+    public String getPatientGender() { return patientGender; }
+    public void setPatientGender(String patientGender) { this.patientGender = patientGender; }
 
+    public String getDiagnosis() { return diagnosis; }
+    public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
 
-@Lob
-private String diagnosis;
+    public String getMedicines() { return medicines; }
+    public void setMedicines(String medicines) { this.medicines = medicines; }
 
+    public LocalDate getNextVisitDate() { return nextVisitDate; }
+    public void setNextVisitDate(LocalDate nextVisitDate) { this.nextVisitDate = nextVisitDate; }
 
-@Lob
-private String medicines;
-
-
-private LocalDate nextVisitDate;
-
-
-public Long getId() {
-    return id;
-}
-
-
-public void setId(Long id) {
-    this.id = id;
-}
-
-
-public LocalDate getPrescriptionDate() {
-    return prescriptionDate;
-}
-
-
-public void setPrescriptionDate(LocalDate prescriptionDate) {
-    this.prescriptionDate = prescriptionDate;
-}
-
-
-public String getPatientName() {
-    return patientName;
-}
-
-
-public void setPatientName(String patientName) {
-    this.patientName = patientName;
-}
-
-
-public Integer getPatientAge() {
-    return patientAge;
-}
-
-
-public void setPatientAge(Integer patientAge) {
-    this.patientAge = patientAge;
-}
-
-
-public String getPatientGender() {
-    return patientGender;
-}
-
-
-public void setPatientGender(String patientGender) {
-    this.patientGender = patientGender;
-}
-
-
-public String getDiagnosis() {
-    return diagnosis;
-}
-
-
-public void setDiagnosis(String diagnosis) {
-    this.diagnosis = diagnosis;
-}
-
-
-public String getMedicines() {
-    return medicines;
-}
-
-
-public void setMedicines(String medicines) {
-    this.medicines = medicines;
-}
-
-
-public LocalDate getNextVisitDate() {
-    return nextVisitDate;
-}
-
-
-public void setNextVisitDate(LocalDate nextVisitDate) {
-    this.nextVisitDate = nextVisitDate;
-}
-
-
+    public String getDoctorName() { return doctorName; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
 }
