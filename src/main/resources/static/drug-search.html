@@ -13,7 +13,7 @@
   <!-- Search Form -->
   <form id="drugForm" class="mb-3">
     <div class="input-group">
-      <input type="text" id="drugInput" class="form-control" placeholder="Enter generic drug name (e.g. paracetamol)">
+      <input type="text" id="drugInput" class="form-control" placeholder="Enter generic drug name (e.g. paracetamol) or RxCUI (e.g. 341248)">
       <button class="btn btn-primary" type="submit">Search</button>
     </div>
   </form>
@@ -36,10 +36,18 @@
 <script>
 document.getElementById("drugForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  const drugName = document.getElementById("drugInput").value.trim();
-  if (!drugName) return alert("Please enter a drug name");
+  const input = document.getElementById("drugInput").value.trim();
+  if (!input) return alert("Please enter a drug name or RxCUI number");
 
-  const url = `https://rxnav.nlm.nih.gov/REST/drugs.json?name=${encodeURIComponent(drugName)}`;
+  let url = "";
+
+  // যদি ইউজার শুধু সংখ্যা দেয় -> ধরে নিবো এটা RxCUI
+  if (/^\d+$/.test(input)) {
+    url = `https://rxnav.nlm.nih.gov/REST/rxcui/${input}/property.json?propName=RxNorm%20Name`;
+  } else {
+    // নাহলে generic name হিসেবে সার্চ করবে
+    url = `https://rxnav.nlm.nih.gov/REST/drugs.json?name=${encodeURIComponent(input)}`;
+  }
 
   try {
     const res = await fetch(url);
@@ -49,6 +57,18 @@ document.getElementById("drugForm").addEventListener("submit", async function(e)
     const tableBody = document.querySelector("#drugTable tbody");
     tableBody.innerHTML = "";
 
+    // যদি RxCUI দিয়ে সার্চ করে
+    if (data.propConceptGroup && data.propConceptGroup.propConcept) {
+      data.propConceptGroup.propConcept.forEach(drug => {
+        const row = `<tr>
+          <td>${drug.rxcui}</td>
+          <td>${drug.propValue}</td>
+        </tr>`;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+    }
+
+    // যদি generic name দিয়ে সার্চ করে
     if (data.drugGroup && data.drugGroup.conceptGroup) {
       data.drugGroup.conceptGroup.forEach(group => {
         if (group.conceptProperties) {
