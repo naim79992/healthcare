@@ -1,5 +1,6 @@
 package com.cmed.healthcare.config;
 
+import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,16 +20,29 @@ public class SecurityConfig {
         this.userRepo = userRepo;
     }
 
+    // @Bean
+    // UserDetailsService userDetailsService() {
+    //     return username -> userRepo.findByUsername(username)
+    //             .map(user -> org.springframework.security.core.userdetails.User
+    //                     .withUsername(user.getUsername())
+    //                     .password(user.getPassword())
+    //                     .roles(user.getRole())
+    //                     .build())
+    //             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    // }
+
     @Bean
-    UserDetailsService userDetailsService() {
-        return username -> userRepo.findByUsername(username)
-                .map(user -> org.springframework.security.core.userdetails.User
-                        .withUsername(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(user.getRole())
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+public UserDetailsService userDetailsService() {
+    return username -> userRepo.findByUsername(username)
+            .filter(user::isEnabled) // only enabled hole login hbe
+            .map(user -> org.springframework.security.core.userdetails.User
+                    .withUsername(user.getUsername())
+                    .password(user.getPassword())
+                    .roles(user.getRole())
+                    .build())
+            .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
+}
+
 
     @Bean
     PasswordEncoder passwordEncoder() {

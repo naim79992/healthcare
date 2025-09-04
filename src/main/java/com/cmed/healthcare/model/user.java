@@ -6,20 +6,22 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users")
-public class user {  // Class name corrected
+public class user {   // Class name corrected to PascalCase
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @NotNull
     private String password; // Store encoded (hashed) password
 
     private String role = "USER"; // Default role
+
+    private boolean enabled = false; // New users disabled until approved
 
     // Default constructor (required by JPA)
     public user() {}
@@ -36,4 +38,7 @@ public class user {  // Class name corrected
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }

@@ -18,12 +18,31 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Signup
+    // //Signup
+    // @PostMapping("/signup")
+    // public ResponseEntity<user> signup(@RequestBody user user) {
+    //     user.setPassword(passwordEncoder.encode(user.getPassword())); // encode password
+    //     return ResponseEntity.ok(userRepo.save(user));
+    // }
+
     @PostMapping("/signup")
-    public ResponseEntity<user> signup(@RequestBody user user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // encode password
-        return ResponseEntity.ok(userRepo.save(user));
-    }
+public ResponseEntity<String> signup(@RequestBody user user) {
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setEnabled(false); // নতুন user disable
+    userRepo.save(user);
+    return ResponseEntity.ok("Signup successful! Please wait for approval.");
+}
+
+@PutMapping("/approve/{id}")
+public ResponseEntity<String> approveUser(@PathVariable Long id) {
+    user user = userRepo.findById(id).orElseThrow();
+    user.setEnabled(true);
+    userRepo.save(user);
+    return ResponseEntity.ok("User approved successfully!");
+}
+
+
+
 
     // Test endpoint (secured)
     @GetMapping("/me")
