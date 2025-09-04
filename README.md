@@ -8,22 +8,60 @@
 
 * User authentication (no anonymous access)
   
-     * **Have pre-stored user credentials data in data.sql**
-     * **User can signup, but they need approval from database adminestrator(make ENABLE=TRUE if account creation request you want to approve), after approval can login.**
+     * **Have pre-stored user credentials data in data.sql, can login using that credential**
+     * **User can signup, but they need approval from database adminestrator for security(make ENABLE=TRUE if account creation request you want to approve), after approval can login.**
+       <img width="1571" height="662" alt="image" src="https://github.com/user-attachments/assets/9f9289ca-02d3-41b6-a254-7b27a9d768f4" />
+        <img width="1613" height="667" alt="image" src="https://github.com/user-attachments/assets/f958d95c-b876-4297-b221-72a417e1261d" />
+       <img width="446" height="461" alt="image" src="https://github.com/user-attachments/assets/af5a58ed-34fc-49fd-98e2-8ce26349834e" />
+
+    * Make Enable=TRUE
+
+      <img width="500" height="217" alt="image" src="https://github.com/user-attachments/assets/969b0cea-9b16-41b8-ac89-d9a89f12d713" />
+
+
+
      * **Can add,modify,delete user credentials from database**
+     * 
+       <img width="987" height="532" alt="1 2 db user credential" src="https://github.com/user-attachments/assets/705025cb-b8af-474b-96fa-0b1d3d6e4573" />
+
      * **Have option to make password encrypted so that database adminestretor can't see real password**
-       
+
+*Allow the authenticated users to create new prescriptions which will be saved in DB.
+Note that you should show proper error messages when invalid data is submitted on
+form submission. The prescription will contain:
+○ Prescription Date (valid date, mandatory)
+○ Patient Name (text, mandatory)
+○ Patient Age (integer, valid age range, mandatory)
+○ Patient Gender (select box, mandatory)
+○ Diagnosis (text area)
+○ Medicines (Text area)
+○ Next visit date (valid date, optional)
+
 * Create, edit, delete prescriptions
 * Day-wise prescription report
 * REST API endpoint: `/api/v1/prescriptions` (JSON response)
 * Role-based access control:
 
-  * **Doctor**: create, edit, delete prescriptions
+  * **Doctor**: create, edit, delete prescriptions. But one Doctor can't see or modify prescriptions of other Doctors.
+  * 
+    <img width="1000" height="886" alt="image" src="https://github.com/user-attachments/assets/b1a2a645-30ea-49ed-b457-5dcc1ee3cd6c" />
+    <img width="1147" height="408" alt="image" src="https://github.com/user-attachments/assets/cd89757b-f0b1-4042-a39a-17956d3aaf22" />
+
   * **Pharmacist/Medical Staff/Admin**: view all prescriptions
+     <img width="1901" height="891" alt="image" src="https://github.com/user-attachments/assets/5301c7cc-5e5d-42f0-8da5-9318b4f2f2cf" />
 
 * Swagger API documentation
+* 
+     <img width="1027" height="667" alt="image" src="https://github.com/user-attachments/assets/1aab042e-aa8a-468b-9556-127a57435467" />
+
+  
 * Responsive UI with form validation
 * Integration with RxNav API for drug interactions
+
+  <img width="1626" height="352" alt="image" src="https://github.com/user-attachments/assets/48fe7df0-d3cc-48ac-85a7-be48586adfe7" />
+
+  <img width="1729" height="451" alt="image" src="https://github.com/user-attachments/assets/f7e3d7b5-a534-476c-9ebe-fdcb7226fed2" />
+
 
 ---
 
@@ -90,13 +128,67 @@ mvn spring-boot:run
 
 ---
 
+Here’s a complete guide you can add to your README:
+
+---
+
 ## Using Swagger for API Documentation
 
 1. **Open Swagger UI:**
 
-```
-http://localhost:8080/swagger-ui/index.html
-```
+   After running your Spring Boot application, open a browser and go to:
+
+   ```
+   http://localhost:8080/swagger-ui/index.html
+   ```
+
+2. **Explore API Endpoints:**
+
+   * You’ll see all available REST endpoints, grouped by controller.
+   * Each endpoint shows:
+
+     * HTTP method (GET, POST, PUT, DELETE)
+     * URL path
+     * Description (if provided via annotations)
+     * Required parameters (query, path, or request body)
+     * Response schema
+
+3. **Try Out Endpoints:**
+
+   * Click on an endpoint to expand it.
+   * Click **“Try it out”**.
+   * Fill in the required parameters or request body in JSON format.
+   * Click **“Execute”**.
+   * You’ll see:
+
+     * **Request URL**
+     * **Request headers**
+     * **Request body**
+     * **Response status code**
+     * **Response body**
+
+4. **View API Response:**
+
+   * Swagger displays the response returned by your API in real-time.
+   * Example: `/api/v1/prescriptions` will show the list of prescriptions in JSON format.
+
+5. **Download OpenAPI Spec (Optional):**
+
+   * Swagger UI generates a machine-readable OpenAPI JSON spec.
+   * You can access it at:
+
+     ```
+     http://localhost:8080/v3/api-docs
+     ```
+
+6. **Notes:**
+
+   * Make sure your Spring Boot application is running.
+   * If you change or add endpoints, Swagger UI automatically reflects the updates.
+   * Use Swagger for testing APIs before integrating with frontend.
+
+---
+
 
 2. **Explore APIs:**
 
