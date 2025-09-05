@@ -12,6 +12,7 @@
      * **User Authentication:** Only registered users can log in; no anonymous access.
      * **Pre-stored Credentials:** Users in data.sql can log in immediately.
      * **Controlled Signup:** New users must be approved by an database administrator (ENABLED = TRUE) before they can log in.
+
        (Persistent Storage: Uses a file-based H2 database to retain user data across application restarts. if you want to use it just comment out code in  applications.properties & data.sql)
        
        <img width="1571" height="662" alt="image" src="https://github.com/user-attachments/assets/9f9289ca-02d3-41b6-a254-7b27a9d768f4" />
