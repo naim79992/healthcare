@@ -1,6 +1,6 @@
 package com.cmed.healthcare.config;
 
-import com.cmed.healthcare.model.User;
+import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepo.findByUsername(username)
-                .filter(User::isEnabled) // must be true in DB
+                .filter(user::isEnabled) // must be true in DB
                 .map(u -> org.springframework.security.core.userdetails.User
                         .withUsername(u.getUsername())
                         .password(u.getPassword()) // must be BCrypt encoded
@@ -63,7 +63,7 @@ public PasswordEncoder passwordEncoder() {
     @Bean
     public AuthenticationSuccessHandler mySuccessHandler() {
         return (request, response, authentication) -> {
-            User currentUser = userRepo.findByUsername(authentication.getName())
+            user currentUser = userRepo.findByUsername(authentication.getName())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found after login"));
 
             String role = currentUser.getRole();
@@ -97,29 +97,19 @@ public PasswordEncoder passwordEncoder() {
         .anyRequest().authenticated()
     )
     .formLogin(form -> form
-        .loginPage("/login.html")
-        .loginProcessingUrl("/login")
-        .usernameParameter("username")
-        .passwordParameter("password")
-        .successHandler(mySuccessHandler())
-        .failureHandler((req, res, ex) -> {
-            // Return JSON instead of redirect
-            res.setStatus(401);
-            res.setContentType("application/json");
-            res.getWriter().write("{\"error\": \"Authentication failed\"}");
-        })
-        .permitAll()
-    )
+    .loginPage("/login.html")
+    .loginProcessingUrl("/login")
+    .usernameParameter("username")
+    .passwordParameter("password")
+    .successHandler(mySuccessHandler())
+    .failureUrl("/login.html?error=true") // redirect back to login with error
+    .permitAll()
+)
     .logout(logout -> logout
-        .logoutUrl("/logout")
-        .logoutSuccessHandler((req, res, auth) -> {
-            res.setStatus(200);
-            res.setContentType("application/json");
-            res.getWriter().write("{\"message\": \"Logged out\"}");
-        })
-        .permitAll()
-    );
-
+     .logoutUrl("/logout")
+     .logoutSuccessUrl("/login.html?logout=true") // redirect after logout
+     .permitAll()
+);
 
         return http.build();
     }

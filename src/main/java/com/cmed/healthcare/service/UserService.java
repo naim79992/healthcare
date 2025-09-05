@@ -1,6 +1,6 @@
 package com.cmed.healthcare.service;
 
-import com.cmed.healthcare.model.User;
+import com.cmed.healthcare.model.user;
 import com.cmed.healthcare.repository.UserRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +17,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUser(String username, String rawPassword) {
-        User user = new User();
+    public user createUser(String username, String rawPassword) {
+        user user = new user();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(rawPassword)); // encode password
         user.setRole("USER");
