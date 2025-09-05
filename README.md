@@ -9,7 +9,10 @@
 * User authentication (no anonymous access)
   
      * **Have pre-stored user credentials data in data.sql, can login using that credential**
-     * **User can signup, but they need approval from database adminestrator for security(make ENABLE=TRUE if account creation request you want to approve), after approval can login.**
+     * **User Authentication:** Only registered users can log in; no anonymous access.
+     * **Pre-stored Credentials:** Users in data.sql can log in immediately.
+     * **Controlled Signup:** New users must be approved by an database administrator (ENABLED = TRUE) before they can log in.
+     * **Persistent Storage:** Uses a file-based H2 database to retain user data across application restarts.
        
        <img width="1571" height="662" alt="image" src="https://github.com/user-attachments/assets/9f9289ca-02d3-41b6-a254-7b27a9d768f4" />
 
