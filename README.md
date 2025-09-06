@@ -136,6 +136,7 @@ mvn spring-boot:run
 
 
 ## Using Swagger for API Documentation
+Implemented for only doctors, not for pharmacist/medical staff.
 
 1. **Open Swagger UI:**
 
