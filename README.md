@@ -58,7 +58,7 @@ form submission. The prescription contain:
      <img width="1901" height="891" alt="image" src="https://github.com/user-attachments/assets/5301c7cc-5e5d-42f0-8da5-9318b4f2f2cf" />
 
 * Swagger API documentation
-* 
+  
      <img width="1027" height="667" alt="image" src="https://github.com/user-attachments/assets/1aab042e-aa8a-468b-9556-127a57435467" />
 
   
