@@ -15,10 +15,14 @@
      * **Persistent Storage:** Uses a file-based H2 database to retain user data across application restarts.
        
        <img width="1571" height="662" alt="image" src="https://github.com/user-attachments/assets/9f9289ca-02d3-41b6-a254-7b27a9d768f4" />
+           <br><br><br><br><br><br>
+
 
         <img width="1613" height="667" alt="image" src="https://github.com/user-attachments/assets/f958d95c-b876-4297-b221-72a417e1261d" />
+         <br><br><br><br><br><br>
 
        <img width="446" height="461" alt="image" src="https://github.com/user-attachments/assets/af5a58ed-34fc-49fd-98e2-8ce26349834e" />
+        <br><br><br>
 
     * **Make Enable option as TRUE to confirming account creation**
 
@@ -29,6 +33,7 @@
      * **Can add,modify,delete user credentials from database**
        
        <img width="987" height="532" alt="1 2 db user credential" src="https://github.com/user-attachments/assets/705025cb-b8af-474b-96fa-0b1d3d6e4573" />
+        <br><br>
 
      * **Have option to make password encrypted so that database adminestretor can't see real password**
 
@@ -52,7 +57,12 @@ form submission. The prescription contain:
   * **But one Doctor can't see or modify prescriptions of other Doctors.**
     
     <img width="1000" height="886" alt="image" src="https://github.com/user-attachments/assets/b1a2a645-30ea-49ed-b457-5dcc1ee3cd6c" />
-    
+    <br><br>
+    <br><br>
+    <br><br>
+
+
+ 
     <img width="1147" height="408" alt="image" src="https://github.com/user-attachments/assets/cd89757b-f0b1-4042-a39a-17956d3aaf22" />
 
     
