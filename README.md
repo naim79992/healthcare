@@ -52,10 +52,16 @@ form submission. The prescription contain:
   * **But one Doctor can't see or modify prescriptions of other Doctors.**
     
     <img width="1000" height="886" alt="image" src="https://github.com/user-attachments/assets/b1a2a645-30ea-49ed-b457-5dcc1ee3cd6c" />
+    
     <img width="1147" height="408" alt="image" src="https://github.com/user-attachments/assets/cd89757b-f0b1-4042-a39a-17956d3aaf22" />
 
+    
+
   * **Pharmacist/Medical Staff/Admin**: view all prescriptions
+    
      <img width="1901" height="891" alt="image" src="https://github.com/user-attachments/assets/5301c7cc-5e5d-42f0-8da5-9318b4f2f2cf" />
+
+     
 
 * Swagger API documentation
   
