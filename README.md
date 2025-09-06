@@ -94,7 +94,8 @@ Each prescription contains:
 * **Backend:** Java, Spring Boot, Spring Security, Spring Data JPA
 * **Database:** H2 (in-memory)
 * **Frontend:** HTML, CSS, JavaScript
-* **API Documentation:** Swagger
+* **API Documentation:** Swagger(only for Doctors, not for other stakeholders)
+* **API Testing:** Postman 
 
 ---
 
