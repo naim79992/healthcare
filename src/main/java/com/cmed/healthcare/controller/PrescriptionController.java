@@ -76,7 +76,6 @@ public class PrescriptionController {
         if (!"DOCTOR".equals(currentUser.getRole())) {
             return ResponseEntity.status(403).build();
         }
-
         // Keep patientName from form
         presc.setDoctorName(currentUser.getUsername());
 
@@ -119,6 +118,7 @@ public class PrescriptionController {
         repo.delete(existing);
         return ResponseEntity.noContent().build();
     }
+
 
     // Day-wise report
     @GetMapping("/report/daywise")

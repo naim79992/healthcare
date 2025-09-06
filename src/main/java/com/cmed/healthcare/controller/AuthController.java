@@ -43,19 +43,15 @@ public ResponseEntity<?> signup(@RequestBody user user) {
                 .body("Error: Username already exists!");
     }
     
-    // Encode password
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-    // Force enabled=false for all signups (if you have this column in User)
+    // enabled=false for all signups (control to make it true to DB)
     user.setEnabled(false);
 
     // Validate role: only allowed roles can be selected
     List<String> allowedRoles = List.of("USER", "DOCTOR", "PHARMACIST", "MEDICAL_STAFF");
     if (!allowedRoles.contains(user.getRole())) {
-        user.setRole("USER"); // default
+        user.setRole("USER"); 
     }
-
-    // Save user
     user saved = userRepo.save(user);
 
     // store all

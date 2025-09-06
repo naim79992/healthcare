@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface PrescriptionRepository extends JpaRepository<Prescription, Long> {
 
-    // All prescriptions in date range
     List<Prescription> findByPrescriptionDateBetween(LocalDate start, LocalDate end);
 
     // For USER

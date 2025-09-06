@@ -23,15 +23,15 @@ public class SecurityConfig {
         this.userRepo = userRepo;
     }
 
-    // Only enabled users can login
+    // Only enabled(Give access from DB) users can login
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepo.findByUsername(username)
                 .filter(user::isEnabled) // must be true in DB
                 .map(u -> org.springframework.security.core.userdetails.User
                         .withUsername(u.getUsername())
-                        .password(u.getPassword()) // must be BCrypt encoded
-                        .roles(u.getRole())        // must match DB role exactly
+                        .password(u.getPassword())
+                        .roles(u.getRole())        
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found or not approved"));
     }
@@ -77,7 +77,6 @@ public PasswordEncoder passwordEncoder() {
         };
     }
 
-    // Security filter chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -93,7 +92,6 @@ public PasswordEncoder passwordEncoder() {
             "/h2-console/**",
             "/api/v1/auth/**"
         ).permitAll()
-        // Everything else secured
         .anyRequest().authenticated()
     )
     .formLogin(form -> form
@@ -102,15 +100,14 @@ public PasswordEncoder passwordEncoder() {
     .usernameParameter("username")
     .passwordParameter("password")
     .successHandler(mySuccessHandler())
-    .failureUrl("/login.html?error=true") // redirect back to login with error
+    .failureUrl("/login.html?error=true") 
     .permitAll()
 )
     .logout(logout -> logout
      .logoutUrl("/logout")
-     .logoutSuccessUrl("/login.html?logout=true") // redirect after logout
+     .logoutSuccessUrl("/login.html?logout=true") 
      .permitAll()
 );
-
         return http.build();
     }
 } 

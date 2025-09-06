@@ -18,10 +18,9 @@ public class Prescription {
     private String medicines;
     private LocalDate nextVisitDate;
 
-    // New field to track doctor
+    // To track doctor
     private String doctorName;
 
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

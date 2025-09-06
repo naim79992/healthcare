@@ -17,16 +17,12 @@ public class user {
     private String username;
 
     @NotNull
-    private String password; // Store encoded (hashed) password
-
+    private String password; 
     private String role = "USER"; // Default role
-
     private boolean enabled = false; // New users disabled until approved
-
-    // Default constructor (required by JPA)
+    
     public user() {}
 
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
